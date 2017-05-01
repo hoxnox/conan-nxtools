@@ -19,10 +19,8 @@ def retrieve(sha256, locations, saveas):
             tools.check_sha256(saveas, sha256)
             break
         except:
-            print("FAILED %s" % location)
             continue
     if not last_location:
         return
-    filename = os.path.basename(last_location)
-    tools.untargz(filename)
-    os.unlink(filename)
+    tools.untargz(saveas)
+    os.unlink(saveas)

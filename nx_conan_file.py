@@ -7,7 +7,7 @@ class NxConanFile(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     extra_options = {"system":[True, False], "root":"ANY"}
     extra_default_options = "system=False", "root="
-    exports = "*"
+    exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/retrieve.py"
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
         self.options.update(self.extra_options)
