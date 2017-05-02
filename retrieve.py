@@ -2,7 +2,7 @@ import os
 from shutil import copy
 from conans import tools
 
-def retrieve(sha256, locations):
+def retrieve(sha256, locations, where):
     saveas = "sources.tar.gz"
     vendor_dir = os.getenv("VENDOR_DIR", "~/.vendor")
     last_location = None
@@ -23,5 +23,5 @@ def retrieve(sha256, locations):
             continue
     if not last_location:
         raise
-    tools.untargz(saveas)
+    tools.untargz(saveas, where)
     os.unlink(saveas)
