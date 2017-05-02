@@ -8,6 +8,7 @@ class NxConanFile(ConanFile):
     extra_options = {"system":[True, False], "root":"ANY"}
     extra_default_options = "system=False", "root="
     exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/retrieve.py"
+    staging_dir = "staging"
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
         self.options.update(self.extra_options)
@@ -18,29 +19,44 @@ class NxConanFile(ConanFile):
         super(NxConanFile, self).__init__(output, runner, settings, conanfile_directory, user, channel)
 
 
+    def do_package(self):
+        pass
+
     def package(self):
         if self.options.system:
+            self.output.warn("Using system, skipping package()")
             return
-        self.copy("tools")
-        self.copy("*.h", dst="include", src="distr/include")
-        self.copy("*.la"   , dst="lib", src="distr/lib")
-        self.copy("*.a"    , dst="lib", src="distr/lib")
-        self.copy("*.so"   , dst="lib", src="distr/lib")
-        self.copy("*.dll"  , dst="lib", src="distr/lib")
-        self.copy("*.dylib", dst="lib", src="distr/lib")
+        staging_include = "{staging_dir}/include".format(staging_dir=self.staging_dir)
+        staging_lib = "{staging_dir}/lib".format(staging_dir=self.staging_dir)
+        self.copy(pattern="*",        dst="include", src=staging_include)
+        self.copy(pattern="*.la",     dst="lib", src=staging_lib)
+        self.copy(pattern="*.a",      dst="lib", src=staging_lib)
+        self.copy(pattern="*.so",     dst="lib", src=staging_lib)
+        self.copy(pattern="*.so.*",   dst="lib", src=staging_lib)
+        self.copy(pattern="*.dll"  ,  dst="lib", src=staging_lib)
+        self.copy(pattern="*.dylib*", dst="lib", src=staging_lib)
+        self.copy(pattern="*.lib",    dst="lib", src=staging_lib)
+        self.do_package()
 
+
+    def do_imports(self):
+        pass
 
     def imports(self):
         if self.options.system:
+            self.output.warn("Using system, skipping imports()")
             return
-        self.copy("*.dll"   , dst="bin", src="lib")
+        self.copy("*.dll"   , dst="bin", src="bin")
         self.copy("*.dylib*", dst="bin", src="lib")
         self.copy("*.so"    , dst="lib", src="lib")
+        self.do_imports()
 
+
+    def do_package_info(self):
+        pass
 
     def package_info(self):
         self.do_package_info()
-        self.env_info.PYTHONPATH.append(self.package_folder)
         if self.options.system:
             self.cpp_info.includedirs = []
             self.cpp_info.libdirs = []
@@ -49,14 +65,22 @@ class NxConanFile(ConanFile):
                 self.cpp_info.libdirs.append(str(self.options.root) + "/lib")
 
 
+    def do_build(self):
+        pass
+
     def build(self):
         if self.options.system:
+            self.output.warn("Using system, skipping build()")
             return
         self.do_build()
 
 
+    def do_source(self):
+        pass
+
     def source(self):
         if self.options.system:
+            self.output.warn("Using system, skipping source()")
             return
         self.do_source()
 

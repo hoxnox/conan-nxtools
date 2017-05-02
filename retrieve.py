@@ -21,6 +21,6 @@ def retrieve(sha256, locations, saveas):
         except:
             continue
     if not last_location:
-        return
+        raise
     tools.untargz(saveas)
     os.unlink(saveas)
