@@ -2,7 +2,8 @@ import os
 from shutil import copy
 from conans import tools
 
-def retrieve(sha256, locations, saveas):
+def retrieve(sha256, locations):
+    saveas = "sources.tar.gz"
     vendor_dir = os.getenv("VENDOR_DIR", "~/.vendor")
     last_location = None
     for location in locations:

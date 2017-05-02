@@ -1,6 +1,6 @@
 from conans import tools, ConanFile
 import os
-from shutil import copy
+from shutil import copy, rmtree
 
 class NxConanFile(ConanFile):
 
@@ -16,6 +16,7 @@ class NxConanFile(ConanFile):
             self.default_options = self.extra_default_options + self.default_options
         elif isinstance(self.default_options, str):
             self.default_options = self.extra_default_options + (self.default_options, )
+        self.staging_dir = "{conanfile_dir}/staging".format(conanfile_dir=conanfile_directory)
         super(NxConanFile, self).__init__(output, runner, settings, conanfile_directory, user, channel)
 
 
@@ -36,6 +37,7 @@ class NxConanFile(ConanFile):
         self.copy(pattern="*.dll"  ,  dst="lib", src=staging_lib)
         self.copy(pattern="*.dylib*", dst="lib", src=staging_lib)
         self.copy(pattern="*.lib",    dst="lib", src=staging_lib)
+        rmtree(self.staging_dir)
         self.do_package()
 
 
