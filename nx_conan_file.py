@@ -5,10 +5,10 @@ from tempfile import mkdtemp
 
 class NxConanFile(ConanFile):
 
-    settings = "os", "compiler", "build_type", "arch"
     extra_options = {"system":[True, False], "root":"ANY"}
     extra_default_options = "system=False", "root="
-    exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
+    extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
+    exports = extra_exports
     staging_dir = "staging"
     retrieved_files = ()
 
@@ -32,11 +32,19 @@ class NxConanFile(ConanFile):
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
         self.options.update(self.extra_options)
+
         if isinstance(self.default_options, (list, tuple)):
             self.default_options = self.extra_default_options + self.default_options
         elif isinstance(self.default_options, str):
             self.default_options = self.extra_default_options + (self.default_options, )
+
         self.staging_dir = mkdtemp()
+
+        if isinstance(self.exports, (list, tuple)):
+            self.exports = self.extra_exports + self.exports
+        elif isinstance(self.exports, str):
+            self.exports = self.extra_exports + (self.exports, )
+
         super(NxConanFile, self).__init__(output, runner, settings, conanfile_directory, user, channel)
 
 
