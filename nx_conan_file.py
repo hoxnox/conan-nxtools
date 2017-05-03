@@ -8,8 +8,27 @@ class NxConanFile(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     extra_options = {"system":[True, False], "root":"ANY"}
     extra_default_options = "system=False", "root="
-    exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/retrieve.py"
+    exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
     staging_dir = "staging"
+    retrieved_files = ()
+
+    def retrieve(self, sha256, locations, saveas):
+        vendor_dir = os.getenv("VENDOR_DIR", "~/.vendor")
+        for location in locations:
+            try:
+                if location[:4] == "http":
+                    tools.download(location, saveas)
+                elif location[:9] == "vendor://":
+                    location = '{vendor_dir}/{location}'.format(location=location[9:],
+                                                                vendor_dir=vendor_dir)
+                    copy(location, saveas)
+                else:
+                    copy(location, saveas)
+                tools.check_sha256(saveas, sha256)
+                self.retrieved_files = (self.retrieved_files, saveas)
+                break
+            except:
+                continue
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
         self.options.update(self.extra_options)
