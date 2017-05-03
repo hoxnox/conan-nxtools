@@ -49,9 +49,9 @@ class NxConanFile(ConanFile):
         if self.options.system:
             self.output.warn("Using system, skipping imports()")
             return
-        self.copy("*.dll"   , dst="bin", src="bin")
-        self.copy("*.dylib*", dst="bin", src="lib")
-        self.copy("*.so"    , dst="lib", src="lib")
+        self.copy(pattern="*.dll"   , dst="bin", src="bin")
+        self.copy(pattern="*.dylib*", dst="bin", src="lib")
+        self.copy(pattern="*.so*"  , dst="lib", src="lib")
         self.do_imports()
 
 
