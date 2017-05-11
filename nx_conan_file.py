@@ -5,9 +5,9 @@ from tempfile import mkdtemp
 
 class NxConanFile(ConanFile):
 
-    extra_options = {"system":[True, False], "root":"ANY"}
-    extra_default_options = "system=False", "root="
-    extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py"
+    extra_options = {"system":[True, False], "root":"ANY", "static_crt":[True, False]}
+    extra_default_options = "system=False", "root=", "static_crt=True"
+    extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/StaticMSVC_C.cmake", "nxtools/StaticMSVC_CXX.cmake"
     exports = extra_exports
     staging_dir = "staging"
     retrieved_files = ()
@@ -29,6 +29,13 @@ class NxConanFile(ConanFile):
                 break
             except:
                 continue
+
+    def cmake_crt_linking_flags(self):
+        if self.settings.compiler == "Visual Studio" and self.settings.compiler.runtime == "MT":
+            return {"CMAKE_USER_MAKE_RULES_OVERRIDE":self.conanfile_directory + "/nxtools/StaticMSVC_C.cmake",
+                    "CMAKE_USER_MAKE_RULES_OVERRIDE_CXX":self.conanfile_directory + "/nxtools/StaticMSVC_CXX.cmake"}
+        else:
+            return {}
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
         self.options.update(self.extra_options)
