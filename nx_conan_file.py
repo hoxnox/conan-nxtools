@@ -1,4 +1,5 @@
 from conans import tools, ConanFile
+from conans.errors import ConanException
 import os
 from shutil import copy, rmtree
 from tempfile import mkdtemp
@@ -28,7 +29,10 @@ class NxConanFile(ConanFile):
                 self.retrieved_files = (self.retrieved_files, saveas)
                 break
             except:
+                self.output.warn("Failed to retrieve " + location)
                 continue
+        if not self.retrieved_files:
+            raise ConanException("Error retrieving file. All sources failed.")
 
     def cmake_crt_linking_flags(self):
         if self.settings.compiler == "Visual Studio" and self.settings.compiler.runtime == "MT":
