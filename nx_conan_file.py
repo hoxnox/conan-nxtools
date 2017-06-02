@@ -6,11 +6,12 @@ from tempfile import mkdtemp
 
 class NxConanFile(ConanFile):
 
-    extra_options = {"system":[True, False], "root":"ANY", "static_crt":[True, False]}
-    extra_default_options = "system=False", "root=", "static_crt=True"
+    extra_options = {"system":[True, False], "root":"ANY", "static_crt":[True, False], "keep_staging":[True, False]}
+    extra_default_options = "system=False", "root=", "static_crt=True", "keep_staging=True"
     extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/StaticMSVC_C.cmake", "nxtools/StaticMSVC_CXX.cmake"
     exports = extra_exports
     staging_dir = None
+    keep_staging = True
     retrieved_files = ()
 
     def retrieve(self, sha256, locations, saveas):
@@ -76,7 +77,8 @@ class NxConanFile(ConanFile):
             self.copy(pattern="*.lib",    dst="lib", src=staging_lib)
             self.do_package()
         finally:
-            rmtree(self.staging_dir)
+            if not self.options.keep_staging:
+                rmtree(self.staging_dir)
 
 
     def do_imports(self):
@@ -110,8 +112,9 @@ class NxConanFile(ConanFile):
 
     def build(self):
         try:
-            self.staging_dir = "{build_folder}/staging}".format(build_folder=self.build_folder)
-        except AttributeError:
+            self.staging_dir = "{build_folder}/staging".format(
+                build_folder=self.conanfile_directory)
+        except:
             self.staging_dir = mkdtemp()
 
         try:
@@ -120,7 +123,8 @@ class NxConanFile(ConanFile):
                 return
             self.do_build()
         except:
-            rmtree(self.staging_dir)
+            if not self.options.keep_staging:
+                rmtree(self.staging_dir)
             raise
 
     def do_source(self):
