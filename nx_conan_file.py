@@ -10,7 +10,7 @@ class NxConanFile(ConanFile):
     extra_default_options = "system=False", "root=", "static_crt=True"
     extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/StaticMSVC_C.cmake", "nxtools/StaticMSVC_CXX.cmake"
     exports = extra_exports
-    staging_dir = "staging"
+    staging_dir = None
     retrieved_files = ()
 
     def retrieve(self, sha256, locations, saveas):
@@ -49,8 +49,6 @@ class NxConanFile(ConanFile):
         elif isinstance(self.default_options, str):
             self.default_options = self.extra_default_options + (self.default_options, )
 
-        self.staging_dir = mkdtemp()
-
         if isinstance(self.exports, (list, tuple)):
             self.exports = self.extra_exports + self.exports
         elif isinstance(self.exports, str):
@@ -58,26 +56,27 @@ class NxConanFile(ConanFile):
 
         super(NxConanFile, self).__init__(output, runner, settings, conanfile_directory, user, channel)
 
-
     def do_package(self):
         pass
 
     def package(self):
-        if self.options.system:
-            self.output.warn("Using system, skipping package()")
-            return
-        staging_include = "{staging_dir}/include".format(staging_dir=self.staging_dir)
-        staging_lib = "{staging_dir}/lib".format(staging_dir=self.staging_dir)
-        self.copy(pattern="*",        dst="include", src=staging_include)
-        self.copy(pattern="*.la",     dst="lib", src=staging_lib)
-        self.copy(pattern="*.a",      dst="lib", src=staging_lib)
-        self.copy(pattern="*.so",     dst="lib", src=staging_lib)
-        self.copy(pattern="*.so.*",   dst="lib", src=staging_lib)
-        self.copy(pattern="*.dll"  ,  dst="lib", src=staging_lib)
-        self.copy(pattern="*.dylib*", dst="lib", src=staging_lib)
-        self.copy(pattern="*.lib",    dst="lib", src=staging_lib)
-        self.do_package()
-        rmtree(self.staging_dir)
+        try:
+            if self.options.system:
+                self.output.warn("Using system, skipping package()")
+                return
+            staging_include = "{staging_dir}/include".format(staging_dir=self.staging_dir)
+            staging_lib = "{staging_dir}/lib".format(staging_dir=self.staging_dir)
+            self.copy(pattern="*",        dst="include", src=staging_include)
+            self.copy(pattern="*.la",     dst="lib", src=staging_lib)
+            self.copy(pattern="*.a",      dst="lib", src=staging_lib)
+            self.copy(pattern="*.so",     dst="lib", src=staging_lib)
+            self.copy(pattern="*.so.*",   dst="lib", src=staging_lib)
+            self.copy(pattern="*.dll"  ,  dst="lib", src=staging_lib)
+            self.copy(pattern="*.dylib*", dst="lib", src=staging_lib)
+            self.copy(pattern="*.lib",    dst="lib", src=staging_lib)
+            self.do_package()
+        finally:
+            rmtree(self.staging_dir)
 
 
     def do_imports(self):
@@ -110,11 +109,19 @@ class NxConanFile(ConanFile):
         pass
 
     def build(self):
-        if self.options.system:
-            self.output.warn("Using system, skipping build()")
-            return
-        self.do_build()
+        try:
+            self.staging_dir = "{build_folder}/staging}".format(build_folder=self.build_folder)
+        except AttributeError:
+            self.staging_dir = mkdtemp()
 
+        try:
+            if self.options.system:
+                self.output.warn("Using system, skipping build()")
+                return
+            self.do_build()
+        except:
+            rmtree(self.staging_dir)
+            raise
 
     def do_source(self):
         pass
