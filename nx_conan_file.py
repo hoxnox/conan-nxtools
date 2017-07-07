@@ -43,12 +43,19 @@ class NxConanFile(ConanFile):
             return {}
 
     def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
-        self.options.update(self.extra_options)
 
-        if isinstance(self.default_options, (list, tuple)):
-            self.default_options = self.extra_default_options + self.default_options
-        elif isinstance(self.default_options, str):
-            self.default_options = self.extra_default_options + (self.default_options, )
+        if hasattr(self, 'options'):
+            self.options.update(self.extra_options)
+        else:
+            self.options = self.extra_options
+
+        if hasattr(self, 'default_options'):
+            if isinstance(self.default_options, (list, tuple)):
+                self.default_options = self.extra_default_options + self.default_options
+            elif isinstance(self.default_options, str):
+                self.default_options = self.extra_default_options + (self.default_options, )
+        else:
+            self.default_options = self.extra_default_options
 
         if isinstance(self.exports, (list, tuple)):
             self.exports = self.extra_exports + self.exports
