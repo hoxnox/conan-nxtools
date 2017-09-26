@@ -8,7 +8,7 @@ class NxConanFile(ConanFile):
 
     extra_options = {"system":[True, False], "root":"ANY", "static_crt":[True, False], "keep_staging":[True, False]}
     extra_default_options = "system=False", "root=", "static_crt=True", "keep_staging=True"
-    extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/StaticMSVC_C.cmake", "nxtools/StaticMSVC_CXX.cmake"
+    extra_exports = "conanfile.py", "nxtools/__init__.py", "nxtools/nx_conan_file.py", "nxtools/StaticMSVC_C.cmake", "nxtools/StaticMSVC_CXX.cmake", "patch/*"
     exports = extra_exports
     staging_dir = None
     keep_staging = True
