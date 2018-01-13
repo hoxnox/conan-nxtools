@@ -37,12 +37,13 @@ class NxConanFile(ConanFile):
 
     def cmake_crt_linking_flags(self):
         if self.settings.compiler == "Visual Studio" and self.settings.compiler.runtime == "MT":
-            return {"CMAKE_USER_MAKE_RULES_OVERRIDE":self.conanfile_directory + "/nxtools/StaticMSVC_C.cmake",
-                    "CMAKE_USER_MAKE_RULES_OVERRIDE_CXX":self.conanfile_directory + "/nxtools/StaticMSVC_CXX.cmake"}
+            return {"CMAKE_USER_MAKE_RULES_OVERRIDE":self.sorce_folder + "/nxtools/StaticMSVC_C.cmake",
+                    "CMAKE_USER_MAKE_RULES_OVERRIDE_CXX":self.source_folder + "/nxtools/StaticMSVC_CXX.cmake"}
         else:
             return {}
 
-    def __init__(self, output, runner, settings, conanfile_directory, user=None, channel=None):
+    def __init__(self, output, runner, settings, user=None, channel=None):
+        self.options.update(self.extra_options)
 
         if hasattr(self, 'options'):
             self.options.update(self.extra_options)
@@ -62,7 +63,7 @@ class NxConanFile(ConanFile):
         elif isinstance(self.exports, str):
             self.exports = self.extra_exports + (self.exports, )
 
-        super(NxConanFile, self).__init__(output, runner, settings, conanfile_directory, user, channel)
+        super(NxConanFile, self).__init__(output, runner, settings, user, channel)
 
     def do_package(self):
         pass
@@ -120,7 +121,7 @@ class NxConanFile(ConanFile):
     def build(self):
         try:
             self.staging_dir = "{build_folder}/staging".format(
-                build_folder=self.conanfile_directory)
+                build_folder=self.build_folder)
         except:
             self.staging_dir = mkdtemp()
 
