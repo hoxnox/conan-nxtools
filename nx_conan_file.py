@@ -42,7 +42,7 @@ class NxConanFile(ConanFile):
         else:
             return {}
 
-    def __init__(self, output, runner, settings, user=None, channel=None):
+    def __init__(self, output, runner, settings, user=None, channel=None, local=False):
         self.options.update(self.extra_options)
 
         if hasattr(self, 'options'):
@@ -63,7 +63,7 @@ class NxConanFile(ConanFile):
         elif isinstance(self.exports, str):
             self.exports = self.extra_exports + (self.exports, )
 
-        super(NxConanFile, self).__init__(output, runner, settings, user, channel)
+        super(NxConanFile, self).__init__(output, runner, settings, user, channel, local)
 
     def do_package(self):
         pass
