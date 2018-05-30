@@ -37,14 +37,12 @@ class NxConanFile(ConanFile):
 
     def cmake_crt_linking_flags(self):
         if self.settings.compiler == "Visual Studio" and self.settings.compiler.runtime == "MT":
-            return {"CMAKE_USER_MAKE_RULES_OVERRIDE":self.sorce_folder + "/nxtools/StaticMSVC_C.cmake",
+            return {"CMAKE_USER_MAKE_RULES_OVERRIDE":self.source_folder + "/nxtools/StaticMSVC_C.cmake",
                     "CMAKE_USER_MAKE_RULES_OVERRIDE_CXX":self.source_folder + "/nxtools/StaticMSVC_CXX.cmake"}
         else:
             return {}
 
     def __init__(self, *args, **kwargs):
-        self.options.update(self.extra_options)
-
         if hasattr(self, 'options'):
             self.options.update(self.extra_options)
         else:
