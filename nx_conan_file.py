@@ -43,12 +43,12 @@ class NxConanFile(ConanFile):
             return {}
 
     def __init__(self, *args, **kwargs):
-        if hasattr(self, 'options'):
+        if hasattr(self, 'options') and self.options != None:
             self.options.update(self.extra_options)
         else:
             self.options = self.extra_options
 
-        if hasattr(self, 'default_options'):
+        if hasattr(self, 'default_options') and self.default_options != None:
             if isinstance(self.default_options, (list, tuple)):
                 self.default_options = self.extra_default_options + self.default_options
             elif isinstance(self.default_options, str):
